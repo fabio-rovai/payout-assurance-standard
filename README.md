@@ -3,7 +3,7 @@
 **An open standard for checking, by machine, whether a parametric climate insurance product
 actually paid what it promised to the people it promised.**
 
-Version 0.2.1. Standard CC BY 4.0, tooling Apache-2.0. Built by
+Version 0.2.1. Standard CC BY 4.0, tooling Apache-2.0. Provenance and limits: [BUILD_REPORT.md](BUILD_REPORT.md). Built by
 [The Tesseract Academy](https://gov.tesseract.academy/) (Kampakis and Co Ltd).
 
 ---
