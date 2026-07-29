@@ -1,4 +1,4 @@
-# Basis-risk replay, PPAS v0.1.0
+# Basis-risk replay, PPAS v0.2.0
 
 Every product encoding in `products/` replayed against every observed event in
 `data/ph_typhoon_landfalls.csv`. Wind figures are PAGASA ten-minute maximum sustained

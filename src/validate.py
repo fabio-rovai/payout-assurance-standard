@@ -3,6 +3,7 @@
 
 Usage:
     python3 src/validate.py products/ph-typhoon-rice-parametric.ttl
+    python3 src/validate.py --payability "examples/register-*.ttl"
     python3 src/validate.py examples/*.ttl
 
 Exit code 0 if every file conforms, 1 otherwise. This is the whole point of the standard:
@@ -18,13 +19,14 @@ from pyshacl import validate
 ROOT = Path(__file__).resolve().parent.parent
 ONTOLOGY = ROOT / "ontology" / "ppas.ttl"
 SHAPES = ROOT / "shapes" / "ppas-shapes.ttl"
+PAYABILITY_SHAPES = ROOT / "shapes" / "ppas-payability-shapes.ttl"
 
 
-def validate_file(path: Path):
+def validate_file(path: Path, payability: bool = False):
     data = Graph()
     data.parse(ONTOLOGY, format="turtle")
     data.parse(path, format="turtle")
-    shapes = Graph().parse(SHAPES, format="turtle")
+    shapes = Graph().parse(PAYABILITY_SHAPES if payability else SHAPES, format="turtle")
     conforms, _, text = validate(
         data_graph=data,
         shacl_graph=shapes,
@@ -35,11 +37,13 @@ def validate_file(path: Path):
 
 
 def main(argv):
-    if len(argv) < 2:
+    args = [a for a in argv[1:] if a != "--payability"]
+    payability = "--payability" in argv
+    if not args:
         print(__doc__)
         return 2
     paths = []
-    for arg in argv[1:]:
+    for arg in args:
         paths.extend(sorted(Path(p) for p in glob.glob(arg)))
     if not paths:
         print("no input files matched")
@@ -47,7 +51,7 @@ def main(argv):
 
     failures = 0
     for path in paths:
-        conforms, text = validate_file(path)
+        conforms, text = validate_file(path, payability=payability)
         status = "PASS" if conforms else "FAIL"
         try:
             shown = path.resolve().relative_to(ROOT)
@@ -60,7 +64,7 @@ def main(argv):
                 line = line.strip()
                 if line.startswith("Message:"):
                     print(f"         {line[len('Message:'):].strip()}")
-    print(f"\n{len(paths) - failures}/{len(paths)} files conform to PPAS v0.1.0")
+    print(f"\n{len(paths) - failures}/{len(paths)} files conform to PPAS v0.2.0")
     return 1 if failures else 0
 
 

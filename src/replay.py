@@ -85,7 +85,7 @@ def main(argv):
     md = "--markdown" in argv
     out = []
 
-    out.append("# Basis-risk replay, PPAS v0.1.0")
+    out.append("# Basis-risk replay, PPAS v0.2.0")
     out.append("")
     out.append("Every product encoding in `products/` replayed against every observed event in")
     out.append("`data/ph_typhoon_landfalls.csv`. Wind figures are PAGASA ten-minute maximum sustained")

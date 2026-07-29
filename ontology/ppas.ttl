@@ -9,7 +9,7 @@
 <https://w3id.org/ppas> a owl:Ontology ;
     dct:title "Parametric Payout Assurance Standard (PPAS)" ;
     dct:description "A vocabulary for making the promise of a parametric climate insurance product machine-checkable end to end: what the trigger is, who became entitled when it fired, what was disbursed, through which channel, and whether receipt was confirmed." ;
-    owl:versionInfo "0.1.0" ;
+    owl:versionInfo "0.2.0" ;
     dct:creator "Kampakis and Co Ltd trading as The Tesseract Academy" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:comment "Scope note: PPAS deliberately models two things that are usually held in separate systems. The promise (product, trigger, payout function) is normally in policy documentation. The delivery (entitlement, disbursement, confirmation) is normally in payment channel records. Neither alone can answer the question that matters to a farmer or fisher: did the thing that was promised actually happen." .
@@ -136,3 +136,40 @@ ppas:RemittanceAgent a ppas:PayoutChannel ; skos:prefLabel "Remittance agent" .
 ppas:Cheque a ppas:PayoutChannel ; skos:prefLabel "Cheque" .
 ppas:BankTransfer a ppas:PayoutChannel ; skos:prefLabel "Bank transfer" .
 ppas:Cash a ppas:PayoutChannel ; skos:prefLabel "Cash" .
+
+##  ---------------------------------------------------------------
+##  Pre-event payability (v0.2 draft)
+##
+##  Added because field practice in Philippine schemes says money gets stuck
+##  before the event, not only after it. Where cover is subsidised or donor-paid
+##  and enrolled in bulk from a public register, whether a household is actually
+##  payable is decided by register integrity: correct name, correct barangay, a
+##  georeferenced parcel or registered gear, and a live payout instrument in a
+##  matching name. Every one of those is checkable before a storm.
+##  ---------------------------------------------------------------
+
+ppas:Registration a owl:Class ;
+    rdfs:label "Registration" ;
+    rdfs:comment "A household's entry on a public register through which cover is conferred, for example a fisher or farmer register used for bulk enrolment." .
+
+ppas:PayoutInstrument a owl:Class ;
+    rdfs:label "Payout instrument" ;
+    rdfs:comment "The account or mechanism a payout would actually land in: cash card, mobile wallet, bank account, or an over-the-counter arrangement." .
+
+ppas:registryId a owl:DatatypeProperty ; rdfs:domain ppas:Registration ; rdfs:range xsd:string .
+ppas:registerName a owl:DatatypeProperty ; rdfs:domain ppas:Registration ; rdfs:range xsd:string ;
+    rdfs:comment "Name as spelled on the register. Pseudonymise before sharing; the rules compare it to the instrument name without needing to know who the person is." .
+ppas:barangay a owl:DatatypeProperty ; rdfs:domain ppas:Registration ; rdfs:range xsd:string .
+ppas:municipality a owl:DatatypeProperty ; rdfs:domain ppas:Registration ; rdfs:range xsd:string .
+ppas:hasGeoreference a owl:DatatypeProperty ; rdfs:domain ppas:Registration ; rdfs:range xsd:boolean ;
+    rdfs:comment "Whether the insured parcel or registered gear is georeferenced. Without it a location-settled trigger cannot be evaluated for this household." .
+ppas:registeredForProduct a owl:ObjectProperty ; rdfs:domain ppas:Registration ; rdfs:range ppas:ParametricProduct .
+ppas:hasPayoutInstrument a owl:ObjectProperty ; rdfs:domain ppas:Registration ; rdfs:range ppas:PayoutInstrument .
+ppas:instrumentType a owl:DatatypeProperty ; rdfs:domain ppas:PayoutInstrument ; rdfs:range xsd:string .
+ppas:instrumentStatus a owl:DatatypeProperty ; rdfs:domain ppas:PayoutInstrument ; rdfs:range xsd:string ;
+    rdfs:comment "One of active, dormant, closed, or unknown." .
+ppas:accountNameOnRecord a owl:DatatypeProperty ; rdfs:domain ppas:PayoutInstrument ; rdfs:range xsd:string .
+ppas:nameMatchesRegister a owl:DatatypeProperty ; rdfs:domain ppas:PayoutInstrument ; rdfs:range xsd:boolean ;
+    rdfs:comment "Asserted result of comparing the instrument name to the register name. A mismatch is the documented reason many payouts fail at the counter." .
+ppas:mismatchReason a owl:DatatypeProperty ; rdfs:domain ppas:PayoutInstrument ; rdfs:range xsd:string ;
+    rdfs:comment "Required when the name does not match: married name, suffix, transliteration, or a genuine third-party account. Some mismatches are legitimate; unexplained ones are not." .

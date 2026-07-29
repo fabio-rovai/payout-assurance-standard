@@ -3,18 +3,26 @@
 **An open standard for checking, by machine, whether a parametric climate insurance product
 actually paid what it promised to the people it promised.**
 
-Version 0.1.0. Licensed CC BY 4.0. Built by
+Version 0.2.0. Licensed CC BY 4.0. Built by
 [The Tesseract Academy](https://gov.tesseract.academy/) (Kampakis and Co Ltd).
 
 ---
 
 ## Why this exists
 
-Southeast Asia is betting on parametric cover. The Philippine Crop Insurance Corporation
-launched a parametric typhoon product for rice farmers in July 2025, settling on remote-sensed
-wind velocity and georeferenced farm data with payment targeted in three to five days, built
-with PAGASA, PhilRice and IRRI. A world-first parametric product for small-scale fishers has
-been launched in the same market.
+Southeast Asia is betting on parametric cover, and the Philippines is where the bet is being
+placed first.
+
+In November 2025 the Bureau of Fisheries and Aquatic Resources became policyholder for the
+country's first parametric cover for small-scale fishers, with the Philippine Crop Insurance
+Corporation, Rare and Willis (a WTW business), developed through the Ocean Risk and Resilience
+Action Alliance with funding from the Government of Canada and the UK Government's Blue Planet
+Fund. It reaches 14,200 fishers across 24 coastal municipalities, pays up to USD 100 per policy
+cycle, and is offered as a benefit of fisher registration. Separately, on 17 July 2025 the
+Department of Agriculture announced that PCIC is readying a parametric typhoon pilot for rice
+farmers with the Philippine Space Agency and the Philippine Rice Research Institute, settling on
+remote-sensed wind velocity and georeferenced farm data, targeting computation of compensation
+within three to five days.
 
 A parametric product only changes behaviour if the farmer or fisher believes it will pay. Two
 failures break that belief, and neither is visible in the systems that exist today.
@@ -32,16 +40,26 @@ and friction at exactly the moment a household is most exposed.
 The result is that the promise is unverifiable at the moment it matters most. Capital is not the
 binding constraint on adaptation finance at the last mile. Verifiability is.
 
+**And it fails earlier than either of those.** Where cover is premium-subsidised or donor-paid
+and enrolled in bulk from a public register, the household often makes no purchase decision and
+sometimes does not know it is covered. What decides whether they are actually paid is register
+integrity: name spelled correctly, right barangay, a georeferenced parcel or registered gear, and
+a live payout instrument in a matching name. A misspelling or a dormant cash card defeats a
+perfectly designed trigger. Because the Philippine fisher product ties cover to registration, the
+register is not administrative background. It is the enrolment mechanism.
+
 ## What PPAS does
 
-PPAS is a vocabulary plus a set of validation rules that make the promise and the delivery
-checkable as one object.
+PPAS is a vocabulary plus two sets of validation rules covering all three failure points.
 
-1. **It certifies the promise.** Encode a product's trigger, index, data source, payout tiers,
-   settlement window and exclusions, then replay that logic against observed historical events.
-2. **It verifies the delivery.** A shared payout record schema reconciles the fragmented last
-   mile: trigger fired, who was entitled, what was disbursed, through which channel, confirmed
-   received.
+1. **Pre-event payability (P1 to P4).** Run the rules over a register and a payout file and get a
+   list of which registered households could not currently be paid, and why. Every finding is
+   fixable while there is still time to fix it.
+2. **It certifies the promise (R1 to R4).** Encode a product's trigger, index, data source, payout
+   tiers, settlement window and exclusions, then replay that logic against observed events.
+3. **It verifies the delivery (R5 to R8).** A shared payout record schema reconciles the
+   fragmented last mile: trigger fired, who was entitled, what was disbursed, through which
+   channel, confirmed received.
 
 It runs on records the insurer, public insurer, cooperative or wallet provider already holds. It
 requires no new app, no smartphone and no KYC document from the beneficiary, because
@@ -61,28 +79,37 @@ would defeat the purpose.
 | R6 | **The entitlement that vanished: owed, never disbursed, invisible in every existing system** |
 | R7 | **The unverified payment: paid into a channel with no receipt confirmation and no stated reason why receipt is unknown** |
 | R8 | Short payment: less disbursed than owed |
+| P1 | The unreconcilable register entry: no register id, name, barangay, municipality or linked product |
+| P2 | **No georeference, so a trigger settled on the insured location cannot be evaluated for this household at all** |
+| P3 | **Nowhere for the money to land: no payout instrument, or a dormant or closed one** |
+| P4 | The unexplained name mismatch between the instrument and the register, which is what fails at the counter |
 
-R6 and R7 are the rules that encode the last-mile findings directly. An honest "we do not know
-whether this cheque was banked" is a conformant PPAS record. Silence is not.
+R6 and R7 encode the last-mile settlement findings. P1 to P4 encode the pre-event failures, and
+they are the ones worth running first, because a payability report is a to-do list rather than a
+post-mortem. An honest "we do not know whether this cheque was banked" is a conformant PPAS
+record, and so is a declared legitimate name mismatch such as a married name. Silence is not.
 
 ## Run it
 
 Requires Python 3.9 or later with `rdflib` and `pyshacl`.
 
 ```bash
-python3 src/validate.py "products/*.ttl" "examples/*.ttl"   # certify encodings and ledgers
-python3 src/replay.py                                        # basis-risk replay
-python3 src/replay.py --markdown                             # regenerate docs/BASIS_RISK.md
-python3 tests/test_rules.py                                  # assert the rules do real work
+python3 src/validate.py "products/*.ttl" "examples/ledger-*.ttl"  # certify encodings and ledgers
+python3 src/validate.py --payability "examples/register-*.ttl"    # pre-event payability audit
+python3 src/replay.py                                             # basis-risk replay
+python3 src/replay.py --markdown                                  # regenerate docs/BASIS_RISK.md
+python3 tests/test_rules.py                                       # assert the rules do real work
 ```
 
-Current state of this repository:
+Current state of this repository, which is what `tests/test_rules.py` asserts:
 
 ```
-[PASS] products/ph-fisher-landfall-parametric.ttl
-[PASS] products/ph-typhoon-rice-parametric.ttl
-[FAIL] examples/ledger-broken.ttl     <- fails on R6, R7, R8, by design
-[PASS] examples/ledger-clean.ttl
+ok   product ph-typhoon-rice-parametric.ttl conforms
+ok   product ph-fisher-landfall-parametric.ttl conforms
+ok   ledger-clean.ttl conforms
+ok   ledger-broken.ttl fails on ['R6', 'R7', 'R8'] as designed
+ok   register-clean.ttl conforms (including a declared legitimate name mismatch)
+ok   register-broken.ttl fails on ['P1', 'P2', 'P3', 'P4'] as designed
 ```
 
 ## What is real here and what is not
@@ -90,10 +117,12 @@ Current state of this repository:
 This section matters more than the rest of the README. A certification standard that overstates
 its own evidence is worthless.
 
-**Real.** The vocabulary, the eight validation rules, the validator, the replay engine, and the
-test that proves the rules fire on the failures they target. The four historical typhoon events
-in `data/ph_typhoon_landfalls.csv` are real, with PAGASA ten-minute maximum sustained winds at
-landfall and a source URL on every row.
+**Real.** The vocabulary, the twelve validation rules (R1 to R8 and P1 to P4), the validator, the
+replay engine, and the test that proves the rules fire on the failures they target. The four
+historical typhoon events in `data/ph_typhoon_landfalls.csv` are real, with PAGASA ten-minute
+maximum sustained winds at landfall and a source URL on every row. The facts above about the
+fisher product and the PCIC pilot are taken from the Willis, Rare and Department of Agriculture
+announcements, and the partner institutions are named as those sources name them.
 
 **Reconstructed, and labelled as such.** The encoded products carry
 `ppas:encodingConfidence "reconstructed"`. Structural facts about the Philippine rice product are
@@ -109,13 +138,13 @@ a non-conformant ledger. No real beneficiary data is present anywhere in this re
 without which the replay understates spatial basis risk by construction. Any field evidence that
 certified transparency changes what farmers and fishers actually do. That last one is the point:
 the standard proves the logic is encodable, and proves nothing about behaviour. Establishing
-whether it moves enrolment intent requires fieldwork with farmers and fishers, which is the step
+whether it improves what households understand about their own cover requires fieldwork, which is the step
 we are seeking to fund.
 
 ## Roadmap
 
-- **v0.2** Full historical ingest; six to eight products certified; published basis-risk league table.
-- **v0.3** Generated beneficiary-facing payout cards in Tagalog, Cebuano and Vietnamese, produced
+- **v0.3** Full historical ingest; a payability audit on a real register; two products certified with the issuer in the room, replacing reconstructed tiers with official terms.
+- **v0.4** Generated beneficiary-facing payout cards in Filipino and Cebuano, produced
   from the certified logic rather than written by hand, so the document and the contract cannot drift apart.
 - **v1.0** Frozen vocabulary, packaged validator, one live reconciliation against real disbursement
   records, and published field results including negative ones.

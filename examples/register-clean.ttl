@@ -1,0 +1,41 @@
+@prefix ppas: <https://w3id.org/ppas#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <https://w3id.org/ppas/example/reg/> .
+
+#  A register extract where every household is payable today. Synthetic.
+#  Names are pseudonymous codes: the P4 name-match check is an asserted boolean
+#  computed at source, so the register holder never has to send real names anywhere.
+
+ex:Reg001 a ppas:Registration ;
+    ppas:registryId "FISHR-CAM-000001" ;
+    ppas:registerName "PSEUDO-NAME-001" ;
+    ppas:barangay "Poblacion" ;
+    ppas:municipality "Pilar, Camotes" ;
+    ppas:registeredForProduct ex:FisherProduct ;
+    ppas:hasGeoreference true ;
+    ppas:hasPayoutInstrument ex:Inst001 .
+
+ex:Inst001 a ppas:PayoutInstrument ;
+    ppas:instrumentType "mobile wallet" ;
+    ppas:instrumentStatus "active" ;
+    ppas:accountNameOnRecord "PSEUDO-NAME-001" ;
+    ppas:nameMatchesRegister true .
+
+ex:Reg002 a ppas:Registration ;
+    ppas:registryId "FISHR-CAM-000002" ;
+    ppas:registerName "PSEUDO-NAME-002" ;
+    ppas:barangay "San Francisco" ;
+    ppas:municipality "Pilar, Camotes" ;
+    ppas:registeredForProduct ex:FisherProduct ;
+    ppas:hasGeoreference true ;
+    ppas:hasPayoutInstrument ex:Inst002 .
+
+#  A legitimate mismatch, declared. Married name on the wallet, maiden name on the
+#  register. This is payable and PPAS says so, because the reason is stated.
+ex:Inst002 a ppas:PayoutInstrument ;
+    ppas:instrumentType "cash card" ;
+    ppas:instrumentStatus "active" ;
+    ppas:accountNameOnRecord "PSEUDO-NAME-002-MARRIED" ;
+    ppas:nameMatchesRegister false ;
+    ppas:mismatchReason "Married name on instrument, maiden name on register; identity confirmed by cooperative officer." .

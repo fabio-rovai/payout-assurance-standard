@@ -1,0 +1,82 @@
+@prefix ppas: <https://w3id.org/ppas#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <https://w3id.org/ppas/example/regbroken/> .
+
+#  A register extract carrying the four pre-event failures that actually stop
+#  legitimate payouts reaching Philippine households. Every one is fixable before a
+#  storm, which is the entire point of running these rules ex ante. Synthetic data.
+#
+#  Expected failures:
+#    ex:RegNoBarangay   P1  no barangay recorded
+#    ex:RegNoGeo        P2  parcel or gear not georeferenced
+#    ex:RegNoInstrument P3  nowhere for the money to land
+#    ex:InstDormant     P3  instrument dormant, payout will bounce
+#    ex:InstMismatch    P4  name mismatch with no stated reason
+
+ex:RegNoBarangay a ppas:Registration ;
+    ppas:registryId "FISHR-XX-000010" ;
+    ppas:registerName "PSEUDO-NAME-010" ;
+    ppas:municipality "Pilar, Camotes" ;
+    ppas:registeredForProduct ex:FisherProduct ;
+    ppas:hasGeoreference true ;
+    ppas:hasPayoutInstrument ex:InstOK .
+
+ex:InstOK a ppas:PayoutInstrument ;
+    ppas:instrumentType "mobile wallet" ;
+    ppas:instrumentStatus "active" ;
+    ppas:accountNameOnRecord "PSEUDO-NAME-010" ;
+    ppas:nameMatchesRegister true .
+
+ex:RegNoGeo a ppas:Registration ;
+    ppas:registryId "FISHR-XX-000011" ;
+    ppas:registerName "PSEUDO-NAME-011" ;
+    ppas:barangay "Himensulan" ;
+    ppas:municipality "Pilar, Camotes" ;
+    ppas:registeredForProduct ex:FisherProduct ;
+    ppas:hasGeoreference false ;
+    ppas:hasPayoutInstrument ex:InstOK2 .
+
+ex:InstOK2 a ppas:PayoutInstrument ;
+    ppas:instrumentType "cash card" ;
+    ppas:instrumentStatus "active" ;
+    ppas:accountNameOnRecord "PSEUDO-NAME-011" ;
+    ppas:nameMatchesRegister true .
+
+ex:RegNoInstrument a ppas:Registration ;
+    ppas:registryId "FISHR-XX-000012" ;
+    ppas:registerName "PSEUDO-NAME-012" ;
+    ppas:barangay "Poblacion" ;
+    ppas:municipality "Pilar, Camotes" ;
+    ppas:registeredForProduct ex:FisherProduct ;
+    ppas:hasGeoreference true .
+
+ex:RegDormant a ppas:Registration ;
+    ppas:registryId "FISHR-XX-000013" ;
+    ppas:registerName "PSEUDO-NAME-013" ;
+    ppas:barangay "San Francisco" ;
+    ppas:municipality "Pilar, Camotes" ;
+    ppas:registeredForProduct ex:FisherProduct ;
+    ppas:hasGeoreference true ;
+    ppas:hasPayoutInstrument ex:InstDormant .
+
+ex:InstDormant a ppas:PayoutInstrument ;
+    ppas:instrumentType "cash card" ;
+    ppas:instrumentStatus "dormant" ;
+    ppas:accountNameOnRecord "PSEUDO-NAME-013" ;
+    ppas:nameMatchesRegister true .
+
+ex:RegMismatch a ppas:Registration ;
+    ppas:registryId "FISHR-XX-000014" ;
+    ppas:registerName "PSEUDO-NAME-014" ;
+    ppas:barangay "Esperanza" ;
+    ppas:municipality "Pilar, Camotes" ;
+    ppas:registeredForProduct ex:FisherProduct ;
+    ppas:hasGeoreference true ;
+    ppas:hasPayoutInstrument ex:InstMismatch .
+
+ex:InstMismatch a ppas:PayoutInstrument ;
+    ppas:instrumentType "mobile wallet" ;
+    ppas:instrumentStatus "active" ;
+    ppas:accountNameOnRecord "PSEUDO-NAME-099" ;
+    ppas:nameMatchesRegister false .

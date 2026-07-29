@@ -1,0 +1,65 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix ppas: <https://w3id.org/ppas#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+#  PPAS pre-event payability rules, P1 to P4.
+#
+#  These run BEFORE a hazard event, over a register and a payout file. Each one
+#  corresponds to a documented reason a legitimate payout fails to reach a household
+#  in Philippine subsidised and donor-funded schemes. Unlike R1-R8, every failure
+#  these rules find is fixable while there is still time to fix it.
+#
+#  Run separately from the settlement rules:
+#      python3 src/validate.py --payability "examples/register-*.ttl"
+
+ppas:RegistrationShape a sh:NodeShape ;
+    sh:targetClass ppas:Registration ;
+    rdfs:comment "P1 and P2. Catches the register entry that cannot be settled against: incomplete identification, or no georeference so a location-settled trigger cannot be evaluated for this household at all." ;
+    sh:property [
+        sh:path ppas:registryId ; sh:minCount 1 ;
+        sh:message "P1: registration has no register identifier, so it cannot be reconciled to a payout file." ] ;
+    sh:property [
+        sh:path ppas:registerName ; sh:minCount 1 ;
+        sh:message "P1: registration has no recorded name, so no instrument can be matched to it." ] ;
+    sh:property [
+        sh:path ppas:barangay ; sh:minCount 1 ;
+        sh:message "P1: registration has no barangay. Wrong or missing barangay is a documented cause of misdirected payouts." ] ;
+    sh:property [
+        sh:path ppas:municipality ; sh:minCount 1 ;
+        sh:message "P1: registration has no municipality." ] ;
+    sh:property [
+        sh:path ppas:registeredForProduct ; sh:minCount 1 ;
+        sh:message "P1: registration is not linked to a product, so what it entitles the household to is undefined." ] ;
+    sh:property [
+        sh:path ppas:hasGeoreference ; sh:minCount 1 ; sh:datatype xsd:boolean ;
+        sh:message "P2: registration does not record whether the parcel or gear is georeferenced." ] ;
+    sh:property [
+        sh:path ppas:hasGeoreference ; sh:hasValue true ;
+        sh:message "P2: parcel or gear is not georeferenced, so a trigger settled on the insured location cannot be evaluated for this household." ] ;
+    ##  P3: there must be somewhere for the money to go
+    sh:property [
+        sh:path ppas:hasPayoutInstrument ; sh:minCount 1 ;
+        sh:message "P3: registration has no payout instrument. The trigger can fire perfectly and the money still has nowhere to land." ] .
+
+ppas:PayoutInstrumentShape a sh:NodeShape ;
+    sh:targetClass ppas:PayoutInstrument ;
+    rdfs:comment "P3 and P4. Catches the dead instrument and the unexplained name mismatch, which is what actually stops a household being paid at the counter." ;
+    sh:property [
+        sh:path ppas:instrumentType ; sh:minCount 1 ;
+        sh:message "P3: instrument does not state its type." ] ;
+    sh:property [
+        sh:path ppas:instrumentStatus ; sh:minCount 1 ;
+        sh:in ( "active" "dormant" "closed" "unknown" ) ;
+        sh:message "P3: instrument status must be stated as active, dormant, closed or unknown." ] ;
+    sh:property [
+        sh:path ppas:instrumentStatus ; sh:hasValue "active" ;
+        sh:message "P3: instrument is not active. A dormant or closed cash card is a payout that will bounce." ] ;
+    sh:property [
+        sh:path ppas:nameMatchesRegister ; sh:minCount 1 ; sh:datatype xsd:boolean ;
+        sh:message "P4: instrument does not record whether its account name matches the register name." ] ;
+    sh:or (
+        [ sh:property [ sh:path ppas:nameMatchesRegister ; sh:hasValue true ] ]
+        [ sh:property [ sh:path ppas:mismatchReason ; sh:minCount 1 ] ]
+    ) ;
+    sh:message "P4: account name does not match the register and no reason is stated. Some mismatches are legitimate, such as a married name or a suffix; an unexplained one is a payout that fails at the counter." .
