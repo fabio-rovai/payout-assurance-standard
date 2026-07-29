@@ -170,6 +170,18 @@ we are seeking to fund.
 - **v1.0** Frozen vocabulary, packaged validator, one live reconciliation against real disbursement
   records, and published field results including negative ones.
 
+## Written up
+
+Six articles explain the reasoning behind this repository, each engaging a different piece of the
+index-insurance literature:
+
+- [Can a parametric climate insurance product prove it paid?](https://gov.tesseract.academy/research/parametric-payout-assurance) — the pillar: three failure points, twelve rules.
+- [The 8 km/h that decided a season](https://gov.tesseract.academy/research/basis-risk-false-negative) — computing the Nalgae false negative, and what the revisionist basis-risk literature gets right.
+- [The payout that fails before the storm](https://gov.tesseract.academy/research/pre-event-payability) — register integrity as the binding constraint under bulk enrolment.
+- [Two products, one headline, different promises](https://gov.tesseract.academy/research/spatial-basis-disclosure) — why spatial basis is the disclosure that decides who gets paid.
+- [Verification cuts both ways](https://gov.tesseract.academy/research/verification-burden-paradox) — absent verification destroys trust, added verification destroys uptake, and where that leaves the checking.
+- [What a certification standard owes its own evidence](https://gov.tesseract.academy/research/assurance-provenance-discipline) — the provenance discipline, including catching ourselves citing Wikipedia.
+
 ## Citing and contributing
 
 Issues and pull requests welcome, particularly from insurers, public insurers, cooperatives and
