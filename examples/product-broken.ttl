@@ -1,0 +1,40 @@
+@prefix ppas: <https://w3id.org/ppas#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <https://w3id.org/ppas/example/badproduct/> .
+
+#  A product encoding carrying the failures that rules R1 to R5 exist to catch. This file is
+#  the negative test for the certification half of the standard: without it, R1 to R5 are only
+#  ever asserted to PASS on well-formed input, which proves nothing about whether they fire.
+#
+#  Expected failures:
+#    ex:VagueProduct    R1  no source documentation, no encoding confidence, no settlement window
+#    ex:VagueTrigger    R2  no data source, no unit, no comparator
+#    ex:VagueIndex      R3  no measurement basis, no spatial basis (the basis-risk disclosure)
+#    ex:BadTier         R4  payout ratio above 1.0, no threshold
+#    ex:OrphanEntitlement R5  an amount owed with no event, product or beneficiary
+#
+#  This is what a brochure looks like when you try to encode it: "cover against typhoons",
+#  with nothing a third party could ever settle or dispute. Synthetic.
+
+ex:VagueProduct a ppas:ParametricProduct ;
+    rdfs:label "Typhoon protection for farmers (brochure-grade, unassurable)" ;
+    ppas:hasTrigger ex:VagueTrigger ;
+    ppas:hasPayoutTier ex:BadTier ;
+    ppas:sumInsured "20000"^^xsd:decimal ;
+    ppas:currency "PHP" .
+
+ex:VagueTrigger a ppas:Trigger ;
+    rdfs:label "Strong winds" ;
+    ppas:observesIndex ex:VagueIndex ;
+    ppas:thresholdValue "185"^^xsd:decimal .
+
+ex:VagueIndex a ppas:Index ;
+    rdfs:label "Wind speed" .
+
+ex:BadTier a ppas:PayoutTier ;
+    ppas:tierPayoutRatio "1.5"^^xsd:decimal .
+
+ex:OrphanEntitlement a ppas:Entitlement ;
+    rdfs:label "An amount recorded as owed, with nothing behind it" ;
+    ppas:entitledAmount "20000"^^xsd:decimal .

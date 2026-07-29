@@ -3,7 +3,7 @@
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-#  PPAS assurance rules, v0.2.0
+#  PPAS assurance rules, v0.2.1
 #
 #  Each rule exists because a documented failure mode exists. The comment on each
 #  shape names the failure it catches. Rules R5 to R8 encode the last-mile gaps

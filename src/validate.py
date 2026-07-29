@@ -64,7 +64,7 @@ def main(argv):
                 line = line.strip()
                 if line.startswith("Message:"):
                     print(f"         {line[len('Message:'):].strip()}")
-    print(f"\n{len(paths) - failures}/{len(paths)} files conform to PPAS v0.2.0")
+    print(f"\n{len(paths) - failures}/{len(paths)} files conform to PPAS v0.2.1")
     return 1 if failures else 0
 
 

@@ -60,6 +60,19 @@ def main():
         else:
             print(f"ok   ledger-broken.ttl fails on {sorted(found)} as designed")
 
+    conforms, report = validate_file(ROOT / "examples" / "product-broken.ttl")
+    if conforms:
+        failures.append("product-broken.ttl conformed, so R1 to R5 are not doing any work")
+    else:
+        found = rules_in(report)
+        missing = {"R1", "R2", "R3", "R4", "R5"} - found
+        if missing:
+            failures.append(
+                f"product-broken.ttl failed, but rules {sorted(missing)} did not fire. "
+                f"Fired: {sorted(found)}")
+        else:
+            print(f"ok   product-broken.ttl fails on {sorted(found)} as designed")
+
     conforms, report = validate_file(ROOT / "examples" / "register-clean.ttl", payability=True)
     if not conforms:
         failures.append(f"register-clean.ttl should conform but did not:\n{report}")

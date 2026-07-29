@@ -1,16 +1,28 @@
-Creative Commons Attribution 4.0 International (CC BY 4.0)
-
+Parametric Payout Assurance Standard (PPAS)
 Copyright (c) 2026 Kampakis and Co Ltd, trading as The Tesseract Academy.
 
-You are free to share and adapt this material for any purpose, including commercially,
-provided you give appropriate credit, provide a link to the licence, and indicate if changes
-were made.
+This repository is dual-licensed by content type, so that the standard can be cited and the
+tooling can actually be reused without a licence conversation.
 
-Full licence text: https://creativecommons.org/licenses/by/4.0/legalcode
+1. THE STANDARD AND ITS DOCUMENTATION
+   Applies to: ontology/, shapes/, products/, examples/, data/, docs/, README.md
+   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
+   https://creativecommons.org/licenses/by/4.0/legalcode
+   Attribution: "Parametric Payout Assurance Standard (PPAS), Kampakis and Co Ltd trading as
+   The Tesseract Academy, CC BY 4.0."
 
-Attribution: "Parametric Payout Assurance Standard (PPAS), Kampakis and Co Ltd trading as
-The Tesseract Academy, CC BY 4.0."
+2. THE SOFTWARE
+   Applies to: src/, tests/
+   Licence: Apache License 2.0
+   https://www.apache.org/licenses/LICENSE-2.0
 
-Note on the software in src/ and tests/: the same CC BY 4.0 terms are applied for simplicity of
-a single-licence repository. If you need the code under a conventional software licence such as
-Apache 2.0 or MIT for downstream use, open an issue and it will be dual-licensed on request.
+   Licensed under the Apache License, Version 2.0 (the "License"); you may not use these files
+   except in compliance with the License. You may obtain a copy of the License at the URL above.
+   Unless required by applicable law or agreed to in writing, software distributed under the
+   License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+   either express or implied. See the License for the specific language governing permissions
+   and limitations under the License.
+
+Why the split: a Creative Commons licence is the right instrument for a standard and the wrong
+one for code. A third party being able to run the validator without asking us is the entire
+point of PPAS, so the tooling carries a conventional, permissive software licence.

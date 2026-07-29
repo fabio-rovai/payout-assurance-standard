@@ -3,7 +3,7 @@
 **An open standard for checking, by machine, whether a parametric climate insurance product
 actually paid what it promised to the people it promised.**
 
-Version 0.2.0. Licensed CC BY 4.0. Built by
+Version 0.2.1. Standard CC BY 4.0, tooling Apache-2.0. Built by
 [The Tesseract Academy](https://gov.tesseract.academy/) (Kampakis and Co Ltd).
 
 ---
@@ -108,9 +108,21 @@ ok   product ph-typhoon-rice-parametric.ttl conforms
 ok   product ph-fisher-landfall-parametric.ttl conforms
 ok   ledger-clean.ttl conforms
 ok   ledger-broken.ttl fails on ['R6', 'R7', 'R8'] as designed
+ok   product-broken.ttl fails on ['R1', 'R2', 'R3', 'R4', 'R5', 'R6'] as designed
 ok   register-clean.ttl conforms (including a declared legitimate name mismatch)
 ok   register-broken.ttl fails on ['P1', 'P2', 'P3', 'P4'] as designed
 ```
+
+Every one of the twelve rules has a case built to trip it. A rule that is only ever asserted to
+pass on well-formed input is decoration, so `examples/product-broken.ttl` is a brochure-grade
+encoding ("cover against typhoons") that nothing could ever settle or dispute.
+
+The most useful single output is the documented false negative in
+[`docs/BASIS_RISK.md`](docs/BASIS_RISK.md): Severe Tropical Storm Nalgae (Paeng), October 2022,
+came ashore at 110 km/h, 8 km/h short of a 118 km/h typhoon trigger. It killed over a hundred
+people, affected more than two million, and destroyed roughly 67,000 tonnes of mostly rice, worth
+about PHP 1.3 billion. Both encoded products pay nothing. A farmer who lost a field to Nalgae and
+received nothing did not experience an index limitation. They experienced a broken promise.
 
 ## What is real here and what is not
 
@@ -118,11 +130,20 @@ This section matters more than the rest of the README. A certification standard 
 its own evidence is worthless.
 
 **Real.** The vocabulary, the twelve validation rules (R1 to R8 and P1 to P4), the validator, the
-replay engine, and the test that proves the rules fire on the failures they target. The four
-historical typhoon events in `data/ph_typhoon_landfalls.csv` are real, with PAGASA ten-minute
-maximum sustained winds at landfall and a source URL on every row. The facts above about the
-fisher product and the PCIC pilot are taken from the Willis, Rare and Department of Agriculture
-announcements, and the partner institutions are named as those sources name them.
+replay engine, and the tests, which assert that every one of the twelve fires on a case built to
+trip it. The five historical events in `data/ph_typhoon_landfalls.csv` are real, with landfall
+wind, the measuring agency, and a source URL on every row. The facts above about the fisher product
+and the PCIC pilot are taken from the Willis, Rare and Department of Agriculture announcements, and
+the partner institutions are named as those sources name them.
+
+**Weakly sourced, and now labelled per row.** Only one of the five events (Mangkhut) cites a PAGASA
+primary document. The others rest on reputable secondary reporting of PAGASA bulletins, and one row
+(Haiyan) cites Wikipedia. A standard that says overstating your own evidence is worthless cannot
+quietly cite an encyclopedia for a landfall wind speed, so `data/ph_typhoon_landfalls.csv` now
+carries a `source_type` column marking each row primary or secondary. PAGASA's public archive does
+not currently publish per-storm summaries for 2013, 2021, 2022 or 2023, so replacing these with
+primary values is real work rather than a search, and it is tracked in the roadmap. Nalgae's figure
+is the JMA ten-minute value, not PAGASA, and the `agency` column says so.
 
 **Reconstructed, and labelled as such.** The encoded products carry
 `ppas:encodingConfidence "reconstructed"`. Structural facts about the Philippine rice product are
@@ -143,7 +164,7 @@ we are seeking to fund.
 
 ## Roadmap
 
-- **v0.3** Full historical ingest; a payability audit on a real register; two products certified with the issuer in the room, replacing reconstructed tiers with official terms.
+- **v0.3** Primary PAGASA sourcing for every event, replacing the secondary rows; full historical ingest; a payability audit on a real register; two products certified with the issuer in the room, replacing reconstructed tiers with official terms.
 - **v0.4** Generated beneficiary-facing payout cards in Filipino and Cebuano, produced
   from the certified logic rather than written by hand, so the document and the contract cannot drift apart.
 - **v1.0** Frozen vocabulary, packaged validator, one live reconciliation against real disbursement

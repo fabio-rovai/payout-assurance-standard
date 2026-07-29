@@ -9,7 +9,7 @@
 <https://w3id.org/ppas> a owl:Ontology ;
     dct:title "Parametric Payout Assurance Standard (PPAS)" ;
     dct:description "A vocabulary for making the promise of a parametric climate insurance product machine-checkable end to end: what the trigger is, who became entitled when it fired, what was disbursed, through which channel, and whether receipt was confirmed." ;
-    owl:versionInfo "0.2.0" ;
+    owl:versionInfo "0.2.1" ;
     dct:creator "Kampakis and Co Ltd trading as The Tesseract Academy" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:comment "Scope note: PPAS deliberately models two things that are usually held in separate systems. The promise (product, trigger, payout function) is normally in policy documentation. The delivery (entitlement, disbursement, confirmation) is normally in payment channel records. Neither alone can answer the question that matters to a farmer or fisher: did the thing that was promised actually happen." .

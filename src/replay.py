@@ -85,11 +85,12 @@ def main(argv):
     md = "--markdown" in argv
     out = []
 
-    out.append("# Basis-risk replay, PPAS v0.2.0")
+    out.append("# Basis-risk replay, PPAS v0.2.1")
     out.append("")
     out.append("Every product encoding in `products/` replayed against every observed event in")
     out.append("`data/ph_typhoon_landfalls.csv`. Wind figures are PAGASA ten-minute maximum sustained")
-    out.append("winds at landfall, each row individually sourced in the CSV. Classes are computed under")
+    out.append("winds at landfall except Nalgae, which is the JMA ten-minute value; the agency and whether the")
+    out.append("source is primary or secondary is recorded per row in the CSV. Classes are computed under")
     out.append("PAGASA's post-March-2022 scale applied retrospectively.")
     out.append("")
     out.append("## Payout share of sum insured, by product and event")
@@ -108,6 +109,40 @@ def main(argv):
                    f"| {ev['msw_kmh_10min']} | " + " | ".join(cells) + " |")
     out.append("")
 
+    out.append("## Documented false negatives: real losses that would not have been paid")
+    out.append("")
+    out.append("This is the output that matters to a farmer. An event where the index did not reach the")
+    out.append("trigger, and the loss happened anyway.")
+    out.append("")
+    fn_found = False
+    for ev in events:
+        loss = ev.get("documented_agri_loss_php", "").strip()
+        if not loss:
+            continue
+        observed = Decimal(ev["msw_kmh_10min"])
+        for p in products:
+            if payout_ratio(p, observed) == 0:
+                fn_found = True
+                out.append(
+                    f"- **{ev['name_international']} ({ev['name_local']})**, {ev['landfall_date']}, "
+                    f"{ev['msw_kmh_10min']} km/h {ev['agency']} at landfall, classed a "
+                    f"{ev['class_current_pagasa_scale']}. Documented agricultural loss of "
+                    f"PHP {int(loss):,}, the bulk of it in rice. "
+                    f"`{p['file'].replace('.ttl','')}` **pays nothing**: its trigger needs "
+                    f"{p['triggers'][0]['threshold']} {p['triggers'][0]['unit']} and the storm arrived "
+                    f"{p['triggers'][0]['threshold'] - observed} km/h short of it.")
+    if not fn_found:
+        out.append("- None in this event set.")
+    out.append("")
+    out.append("A wind-indexed product is a bet that wind speed is a good proxy for loss. Nalgae is the")
+    out.append("counter-example sitting in the public record: a storm below typhoon strength that killed")
+    out.append("over a hundred people, affected more than two million, and destroyed roughly 67,000 tonnes")
+    out.append("of mostly rice, while falling short of a 118 km/h trigger by 8 km/h. A farmer who lost a")
+    out.append("field to it and received nothing did not experience an index limitation. They experienced")
+    out.append("a broken promise, and told their barangay so. That is the trust cost this standard exists")
+    out.append("to make visible before a product is sold rather than after it fails.")
+    out.append("")
+
     out.append("## Where the products disagree")
     out.append("")
     disagreements = 0
@@ -124,9 +159,9 @@ def main(argv):
 
     out.append("## The finding that matters: divergence detected from the encoding, not the payout table")
     out.append("")
-    out.append("Read the table above carefully. On these four events the two products behave almost")
-    out.append("identically, and the one difference is a tier ratio. That is not the interesting result,")
-    out.append("and pretending otherwise would be the exact overclaim this standard exists to catch.")
+    out.append("Read the payout table carefully. On the four events above typhoon strength the two products")
+    out.append("behave almost identically, and the one difference is a tier ratio. That is not the whole")
+    out.append("result, and pretending otherwise would be the overclaim this standard exists to catch.")
     out.append("")
     out.append("The real finding is structural, and the validator extracts it without any event data at all:")
     out.append("")
@@ -169,7 +204,7 @@ def main(argv):
     out.append("")
     out.append("## Limits of this replay")
     out.append("")
-    out.append("- Four events. This is a demonstration set, not a full historical ingest. Extending to the")
+    out.append("- Five events. This is a demonstration set, not a full historical ingest. Extending to the")
     out.append("  complete IBTrACS and PAGASA record is month-one work under the FIRST Fund plan.")
     out.append("- Landfall-point wind is used as the observed value for both products, because gridded")
     out.append("  per-parcel wind fields are not in this repository. That means the divergence shown here")

@@ -1,8 +1,9 @@
-# Basis-risk replay, PPAS v0.2.0
+# Basis-risk replay, PPAS v0.2.1
 
 Every product encoding in `products/` replayed against every observed event in
 `data/ph_typhoon_landfalls.csv`. Wind figures are PAGASA ten-minute maximum sustained
-winds at landfall, each row individually sourced in the CSV. Classes are computed under
+winds at landfall except Nalgae, which is the JMA ten-minute value; the agency and whether the
+source is primary or secondary is recorded per row in the CSV. Classes are computed under
 PAGASA's post-March-2022 scale applied retrospectively.
 
 ## Payout share of sum insured, by product and event
@@ -12,7 +13,24 @@ PAGASA's post-March-2022 scale applied retrospectively.
 | Haiyan (Yolanda), 2013-11-08 | 235 | 100% | 100% |
 | Mangkhut (Ompong), 2018-09-15 | 205 | 100% | 100% |
 | Rai (Odette), 2021-12-16 | 195 | 100% | 100% |
+| Nalgae (Paeng), 2022-10-29 | 110 | no payout | no payout |
 | Doksuri (Egay), 2023-07-26 | 175 | 40% | 50% |
+
+## Documented false negatives: real losses that would not have been paid
+
+This is the output that matters to a farmer. An event where the index did not reach the
+trigger, and the loss happened anyway.
+
+- **Nalgae (Paeng)**, 2022-10-29, 110 km/h JMA at landfall, classed a severe tropical storm. Documented agricultural loss of PHP 1,300,000,000, the bulk of it in rice. `ph-fisher-landfall-parametric` **pays nothing**: its trigger needs 118 km/h and the storm arrived 8 km/h short of it.
+- **Nalgae (Paeng)**, 2022-10-29, 110 km/h JMA at landfall, classed a severe tropical storm. Documented agricultural loss of PHP 1,300,000,000, the bulk of it in rice. `ph-typhoon-rice-parametric` **pays nothing**: its trigger needs 118 km/h and the storm arrived 8 km/h short of it.
+
+A wind-indexed product is a bet that wind speed is a good proxy for loss. Nalgae is the
+counter-example sitting in the public record: a storm below typhoon strength that killed
+over a hundred people, affected more than two million, and destroyed roughly 67,000 tonnes
+of mostly rice, while falling short of a 118 km/h trigger by 8 km/h. A farmer who lost a
+field to it and received nothing did not experience an index limitation. They experienced
+a broken promise, and told their barangay so. That is the trust cost this standard exists
+to make visible before a product is sold rather than after it fails.
 
 ## Where the products disagree
 
@@ -20,9 +38,9 @@ PAGASA's post-March-2022 scale applied retrospectively.
 
 ## The finding that matters: divergence detected from the encoding, not the payout table
 
-Read the table above carefully. On these four events the two products behave almost
-identically, and the one difference is a tier ratio. That is not the interesting result,
-and pretending otherwise would be the exact overclaim this standard exists to catch.
+Read the payout table carefully. On the four events above typhoon strength the two products
+behave almost identically, and the one difference is a tier ratio. That is not the whole
+result, and pretending otherwise would be the overclaim this standard exists to catch.
 
 The real finding is structural, and the validator extracts it without any event data at all:
 
@@ -54,7 +72,7 @@ is included only to show the mechanism the structural check is pointing at:
 
 ## Limits of this replay
 
-- Four events. This is a demonstration set, not a full historical ingest. Extending to the
+- Five events. This is a demonstration set, not a full historical ingest. Extending to the
   complete IBTrACS and PAGASA record is month-one work under the FIRST Fund plan.
 - Landfall-point wind is used as the observed value for both products, because gridded
   per-parcel wind fields are not in this repository. That means the divergence shown here
