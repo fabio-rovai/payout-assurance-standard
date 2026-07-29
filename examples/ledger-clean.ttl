@@ -1,0 +1,73 @@
+@prefix ppas: <https://w3id.org/ppas#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <https://w3id.org/ppas/example/> .
+
+#  A payout ledger that passes every PPAS rule: three entitlements, all settled in full,
+#  all with receipt either confirmed or honestly declared unknown with a reason.
+#
+#  Beneficiaries are pseudonymous identifiers. PPAS never needs a name, a phone number or a
+#  KYC record to prove a payout reached its holder, which matters because the people most
+#  exposed to climate risk are frequently the people without documentation.
+#
+#  Data is synthetic. It demonstrates the shape of a compliant ledger, nothing more.
+
+ex:EventRai a ppas:HazardEvent ;
+    rdfs:label "Typhoon Rai (Odette) landfall, Siargao" ;
+    ppas:observedValue "195"^^xsd:decimal ;
+    ppas:eventDate "2021-12-16"^^xsd:date ;
+    ppas:eventLocation "Siargao Island, Surigao del Norte" .
+
+ex:BenA a ppas:Beneficiary ; rdfs:label "PSEUDO-0001" .
+ex:BenB a ppas:Beneficiary ; rdfs:label "PSEUDO-0002" .
+ex:BenC a ppas:Beneficiary ; rdfs:label "PSEUDO-0003" .
+
+ex:Ent1 a ppas:Entitlement ;
+    ppas:triggeredBy ex:EventRai ;
+    ppas:underProduct ex:PHRiceTyphoonParametric ;
+    ppas:beneficiary ex:BenA ;
+    ppas:entitledAmount "20000"^^xsd:decimal .
+
+ex:Dis1 a ppas:Disbursement ;
+    ppas:settles ex:Ent1 ;
+    ppas:viaChannel ppas:MobileWallet ;
+    ppas:disbursedAmount "20000"^^xsd:decimal ;
+    ppas:disbursedOn "2021-12-20"^^xsd:date .
+
+ex:Conf1 a ppas:ReceiptConfirmation ;
+    ppas:confirms ex:Dis1 ;
+    ppas:confirmedOn "2021-12-21"^^xsd:date ;
+    ppas:confirmationMethod "beneficiary-attested" .
+
+ex:Ent2 a ppas:Entitlement ;
+    ppas:triggeredBy ex:EventRai ;
+    ppas:underProduct ex:PHRiceTyphoonParametric ;
+    ppas:beneficiary ex:BenB ;
+    ppas:entitledAmount "20000"^^xsd:decimal .
+
+ex:Dis2 a ppas:Disbursement ;
+    ppas:settles ex:Ent2 ;
+    ppas:viaChannel ppas:RemittanceAgent ;
+    ppas:disbursedAmount "20000"^^xsd:decimal ;
+    ppas:disbursedOn "2021-12-22"^^xsd:date .
+
+ex:Conf2 a ppas:ReceiptConfirmation ;
+    ppas:confirms ex:Dis2 ;
+    ppas:confirmedOn "2022-01-06"^^xsd:date ;
+    ppas:confirmationMethod "cooperative-attested" .
+
+#  The honest unknown. A cheque was issued and nobody can show it was banked. Under PPAS
+#  this is a legitimate, conformant record, because it states what is not known. It is the
+#  silence that the standard refuses, not the uncertainty.
+ex:Ent3 a ppas:Entitlement ;
+    ppas:triggeredBy ex:EventRai ;
+    ppas:underProduct ex:PHRiceTyphoonParametric ;
+    ppas:beneficiary ex:BenC ;
+    ppas:entitledAmount "20000"^^xsd:decimal .
+
+ex:Dis3 a ppas:Disbursement ;
+    ppas:settles ex:Ent3 ;
+    ppas:viaChannel ppas:Cheque ;
+    ppas:disbursedAmount "20000"^^xsd:decimal ;
+    ppas:disbursedOn "2021-12-28"^^xsd:date ;
+    ppas:unconfirmedReason "Cheque issued to barangay collection point; no encashment record returned to the issuer." .

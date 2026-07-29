@@ -1,0 +1,74 @@
+@prefix ppas: <https://w3id.org/ppas#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <https://w3id.org/ppas/example/broken/> .
+
+#  A payout ledger carrying the four failure modes that Philippine last-mile climate
+#  insurance research actually found. Each one should be caught by a named rule. This file
+#  is the test that the standard does useful work: if src/validate.py passes this, the rules
+#  are decorative.
+#
+#  Expected failures:
+#    ex:EntUnsettled   R6  owed, never disbursed, invisible in every existing system
+#    ex:DisSilent      R7  paid into a channel with no receipt and no stated reason
+#    ex:DisNoChannel   R7  no channel recorded, so channel-level failure cannot be localised
+#    ex:EntShort       R8  disbursed less than owed
+#
+#  Data is synthetic.
+
+ex:EventStorm a ppas:HazardEvent ;
+    ppas:observedValue "190"^^xsd:decimal ;
+    ppas:eventDate "2023-09-01"^^xsd:date ;
+    ppas:eventLocation "Synthetic coastal municipality" .
+
+ex:Ben1 a ppas:Beneficiary ; rdfs:label "PSEUDO-9001" .
+ex:Ben2 a ppas:Beneficiary ; rdfs:label "PSEUDO-9002" .
+ex:Ben3 a ppas:Beneficiary ; rdfs:label "PSEUDO-9003" .
+ex:Ben4 a ppas:Beneficiary ; rdfs:label "PSEUDO-9004" .
+
+#  R6: the entitlement that vanished
+ex:EntUnsettled a ppas:Entitlement ;
+    ppas:triggeredBy ex:EventStorm ;
+    ppas:underProduct ex:SomeProduct ;
+    ppas:beneficiary ex:Ben1 ;
+    ppas:entitledAmount "15000"^^xsd:decimal .
+
+#  R7: paid, unconfirmed, and silent about it
+ex:EntSilent a ppas:Entitlement ;
+    ppas:triggeredBy ex:EventStorm ;
+    ppas:underProduct ex:SomeProduct ;
+    ppas:beneficiary ex:Ben2 ;
+    ppas:entitledAmount "15000"^^xsd:decimal .
+
+ex:DisSilent a ppas:Disbursement ;
+    ppas:settles ex:EntSilent ;
+    ppas:viaChannel ppas:MobileWallet ;
+    ppas:disbursedAmount "15000"^^xsd:decimal ;
+    ppas:disbursedOn "2023-09-30"^^xsd:date .
+
+#  R7: no channel recorded
+ex:EntNoChannel a ppas:Entitlement ;
+    ppas:triggeredBy ex:EventStorm ;
+    ppas:underProduct ex:SomeProduct ;
+    ppas:beneficiary ex:Ben3 ;
+    ppas:entitledAmount "15000"^^xsd:decimal .
+
+ex:DisNoChannel a ppas:Disbursement ;
+    ppas:settles ex:EntNoChannel ;
+    ppas:disbursedAmount "15000"^^xsd:decimal ;
+    ppas:disbursedOn "2023-09-14"^^xsd:date ;
+    ppas:unconfirmedReason "Unknown." .
+
+#  R8: short payment
+ex:EntShort a ppas:Entitlement ;
+    ppas:triggeredBy ex:EventStorm ;
+    ppas:underProduct ex:SomeProduct ;
+    ppas:beneficiary ex:Ben4 ;
+    ppas:entitledAmount "15000"^^xsd:decimal .
+
+ex:DisShort a ppas:Disbursement ;
+    ppas:settles ex:EntShort ;
+    ppas:viaChannel ppas:Cash ;
+    ppas:disbursedAmount "9000"^^xsd:decimal ;
+    ppas:disbursedOn "2023-09-12"^^xsd:date ;
+    ppas:unconfirmedReason "Partial cash distribution at barangay hall; balance not tracked." .

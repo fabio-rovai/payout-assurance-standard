@@ -1,0 +1,5 @@
+event_id,name_international,name_local,landfall_date,landfall_location,msw_kmh_10min,gust_kmh,class_current_pagasa_scale,source_url
+PH-2013-HAIYAN,Haiyan,Yolanda,2013-11-08,"Guiuan, Eastern Samar",235,275,super typhoon,https://en.wikipedia.org/wiki/Typhoon_Haiyan
+PH-2018-MANGKHUT,Mangkhut,Ompong,2018-09-15,"Baggao, Cagayan",205,285,super typhoon,https://pubfiles.pagasa.dost.gov.ph/tamss/weather/tc_summary/TY_Ompong_MANGKHUT_2018.pdf
+PH-2021-RAI,Rai,Odette,2021-12-16,"Siargao Island, Surigao del Norte",195,240,super typhoon,https://www.rappler.com/philippines/weather/typhoon-odette-pagasa-forecast-december-16-2021-2pm/
+PH-2023-DOKSURI,Doksuri,Egay,2023-07-26,"Fuga Island, Cagayan",175,240,typhoon,https://www.rappler.com/philippines/weather/typhoon-egay-southwest-monsoon-update-pagasa-forecast-july-26-2023-5am/

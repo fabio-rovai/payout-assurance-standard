@@ -1,0 +1,48 @@
+@prefix ppas: <https://w3id.org/ppas#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <https://w3id.org/ppas/example/> .
+
+#  A landfall-referenced parametric product for small-scale fishers.
+#
+#  PROVENANCE AND LIMITS. This is an ILLUSTRATIVE product, not a reconstruction of any
+#  real issuer's terms. It exists to demonstrate the central finding this standard is
+#  built to expose: two products can advertise the same headline threshold and pay on
+#  completely different sets of real storms, purely because one settles on wind at the
+#  storm centre at landfall and the other settles on wind over the insured location.
+#
+#  Compare with products/ph-typhoon-rice-parametric.ttl. Same 118 km/h headline. Different
+#  spatial basis. Run src/replay.py to see the divergence on real Philippine typhoons.
+
+ex:PHFisherLandfallParametric a ppas:ParametricProduct ;
+    rdfs:label "Landfall-referenced parametric cover for small-scale fishers (illustrative)" ;
+    ppas:hasTrigger ex:TriggerLandfallWind ;
+    ppas:hasPayoutTier ex:FisherTierBase, ex:FisherTierSevere ;
+    ppas:sumInsured "8000"^^xsd:decimal ;
+    ppas:currency "PHP" ;
+    ppas:settlementWindowDays "14"^^xsd:integer ;
+    ppas:encodingConfidence "reconstructed" ;
+    ppas:sourceDocumentation "https://www.pagasa.dost.gov.ph/learning-tools/tropical-cyclone-wind-signal"^^xsd:anyURI ;
+    rdfs:comment "Illustrative. Constructed to expose spatial-basis divergence, not to represent a marketed product." .
+
+ex:TriggerLandfallWind a ppas:Trigger ;
+    rdfs:label "Maximum sustained wind at the storm centre at landfall" ;
+    ppas:observesIndex ex:IndexLandfallMSW ;
+    ppas:dataSource ex:PAGASA ;
+    ppas:thresholdValue "118"^^xsd:decimal ;
+    ppas:unit "km/h" ;
+    ppas:comparator ">=" .
+
+ex:IndexLandfallMSW a ppas:Index ;
+    rdfs:label "Ten-minute maximum sustained wind at landfall point" ;
+    ppas:measurementBasis "10-minute sustained" ;
+    ppas:spatialBasis "storm centre at landfall, national bulletin value" ;
+    rdfs:comment "A fisher 200 km from the landfall point can lose a season of gear to the same storm and receive nothing under this basis, while a farmer under the eye is paid in full. That asymmetry is invisible in product marketing and visible in this field." .
+
+ex:FisherTierBase a ppas:PayoutTier ;
+    ppas:tierThreshold "118"^^xsd:decimal ;
+    ppas:tierPayoutRatio "0.4"^^xsd:decimal .
+
+ex:FisherTierSevere a ppas:PayoutTier ;
+    ppas:tierThreshold "185"^^xsd:decimal ;
+    ppas:tierPayoutRatio "1.0"^^xsd:decimal .

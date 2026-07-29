@@ -1,0 +1,117 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix ppas: <https://w3id.org/ppas#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+#  PPAS assurance rules, v0.1.0
+#
+#  Each rule exists because a documented failure mode exists. The comment on each
+#  shape names the failure it catches. Rules R5 to R8 encode the last-mile gaps
+#  found in Philippine climate-insurance payout research: fragmented channels,
+#  no consistent way to verify receipt, and delay at the moment of need.
+
+##  R1  A promise must be specifiable
+ppas:ProductShape a sh:NodeShape ;
+    sh:targetClass ppas:ParametricProduct ;
+    rdfs:comment "R1. Catches the unspecifiable promise: a product marketed on a hazard with no stated, testable trigger." ;
+    sh:property [
+        sh:path ppas:hasTrigger ; sh:minCount 1 ;
+        sh:message "R1: product has no trigger, so no payout claim about it can be verified." ] ;
+    sh:property [
+        sh:path ppas:sourceDocumentation ; sh:minCount 1 ;
+        sh:message "R1: product encoding has no source documentation, so it is an assertion not a certification." ] ;
+    sh:property [
+        sh:path ppas:encodingConfidence ; sh:minCount 1 ;
+        sh:in ( "official" "public-documentation" "reconstructed" ) ;
+        sh:message "R1: state how close this encoding is to the issuer's binding wording." ] ;
+    sh:property [
+        sh:path ppas:settlementWindowDays ; sh:minCount 1 ; sh:datatype xsd:integer ;
+        sh:message "R1: product does not state how fast it promises to pay, so lateness cannot be measured." ] .
+
+##  R2  A trigger must be independently checkable
+ppas:TriggerShape a sh:NodeShape ;
+    sh:targetClass ppas:Trigger ;
+    rdfs:comment "R2. Catches the untraceable trigger: a threshold with no named measuring authority, no unit, or no explicit comparator." ;
+    sh:property [ sh:path ppas:observesIndex ; sh:minCount 1 ;
+        sh:message "R2: trigger names no index." ] ;
+    sh:property [ sh:path ppas:dataSource ; sh:minCount 1 ;
+        sh:message "R2: trigger names no data source, so nobody outside the issuer can settle it." ] ;
+    sh:property [ sh:path ppas:thresholdValue ; sh:minCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "R2: trigger has no numeric threshold." ] ;
+    sh:property [ sh:path ppas:unit ; sh:minCount 1 ;
+        sh:message "R2: threshold has no unit." ] ;
+    sh:property [ sh:path ppas:comparator ; sh:minCount 1 ;
+        sh:in ( ">=" ">" "<=" "<" ) ;
+        sh:message "R2: comparator must be explicit; 'winds of 185 km/h' is ambiguous at the boundary." ] .
+
+##  R3  The index must be comparable across products
+ppas:IndexShape a sh:NodeShape ;
+    sh:targetClass ppas:Index ;
+    rdfs:comment "R3. Catches the incomparable index and the largest single source of basis risk: an unstated spatial basis. A product settled on wind at the storm centre is a different product from one settled on wind at the farm, even at an identical threshold." ;
+    sh:property [ sh:path ppas:measurementBasis ; sh:minCount 1 ;
+        sh:message "R3: index does not state its measurement basis (10-minute sustained, 1-minute sustained, gust)." ] ;
+    sh:property [ sh:path ppas:spatialBasis ; sh:minCount 1 ;
+        sh:message "R3: index does not state where it is measured. This is the principal basis-risk disclosure." ] .
+
+##  R4  Payout tiers must be unambiguous
+ppas:PayoutTierShape a sh:NodeShape ;
+    sh:targetClass ppas:PayoutTier ;
+    rdfs:comment "R4. Catches the ambiguous payout: a tier with no threshold, or a ratio outside 0 to 1." ;
+    sh:property [ sh:path ppas:tierThreshold ; sh:minCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "R4: payout tier has no threshold." ] ;
+    sh:property [ sh:path ppas:tierPayoutRatio ; sh:minCount 1 ;
+        sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ;
+        sh:message "R4: payout ratio must be a share of sum insured between 0 and 1." ] .
+
+##  R5  An entitlement must be attributable
+ppas:EntitlementShape a sh:NodeShape ;
+    sh:targetClass ppas:Entitlement ;
+    rdfs:comment "R5. Catches the orphan entitlement: an amount owed with no event, no product or no beneficiary behind it." ;
+    sh:property [ sh:path ppas:triggeredBy ; sh:minCount 1 ;
+        sh:message "R5: entitlement does not reference the hazard event that created it." ] ;
+    sh:property [ sh:path ppas:underProduct ; sh:minCount 1 ;
+        sh:message "R5: entitlement does not reference a product." ] ;
+    sh:property [ sh:path ppas:beneficiary ; sh:minCount 1 ;
+        sh:message "R5: entitlement has no beneficiary." ] ;
+    sh:property [ sh:path ppas:entitledAmount ; sh:minCount 1 ; sh:minExclusive 0.0 ;
+        sh:message "R5: entitlement amount must be positive." ] ;
+    ##  R6  Nothing owed may be silently unsettled
+    sh:property [
+        sh:path [ sh:inversePath ppas:settles ] ; sh:minCount 1 ;
+        sh:message "R6: entitlement has no disbursement record. An unsettled entitlement is the failure this standard exists to make visible." ] .
+
+##  R7  A disbursement must be traceable to a confirmed receipt, or say why not
+ppas:DisbursementShape a sh:NodeShape ;
+    sh:targetClass ppas:Disbursement ;
+    rdfs:comment "R7. Catches the unverified payment. Philippine last-mile research found payouts moving through mobile wallets, remittance agents and cheques with no consistent way to verify whether payments were received. This rule makes that state a validation failure rather than an invisible one." ;
+    sh:property [ sh:path ppas:settles ; sh:minCount 1 ;
+        sh:message "R7: disbursement settles no identified entitlement." ] ;
+    sh:property [ sh:path ppas:viaChannel ; sh:minCount 1 ;
+        sh:message "R7: disbursement does not record which channel it travelled on, so channel-level failure cannot be found." ] ;
+    sh:property [ sh:path ppas:disbursedAmount ; sh:minCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "R7: disbursement has no amount." ] ;
+    sh:property [ sh:path ppas:disbursedOn ; sh:minCount 1 ; sh:datatype xsd:date ;
+        sh:message "R7: disbursement has no date, so settlement speed cannot be measured." ] ;
+    sh:or (
+        [ sh:property [ sh:path [ sh:inversePath ppas:confirms ] ; sh:minCount 1 ] ]
+        [ sh:property [ sh:path ppas:unconfirmedReason ; sh:minCount 1 ] ]
+    ) ;
+    sh:message "R7: disbursement is neither confirmed as received nor accompanied by a stated reason why receipt is unknown. An honest 'we do not know' is assurable; silence is not." .
+
+##  R8  Full settlement means the whole amount
+ppas:FullSettlementShape a sh:NodeShape ;
+    sh:targetClass ppas:Entitlement ;
+    rdfs:comment "R8. Catches short payment: a disbursement for less than the amount owed, without an explicit partial-payment record. Implemented as a SPARQL constraint because it compares two nodes." ;
+    sh:sparql [
+        sh:message "R8: total disbursed is less than the amount entitled." ;
+        sh:prefixes ppas: ;
+        sh:select """
+            SELECT $this
+            WHERE {
+                $this ppas:entitledAmount ?owed .
+                ?d ppas:settles $this ;
+                   ppas:disbursedAmount ?amount .
+            }
+            GROUP BY $this ?owed
+            HAVING (SUM(?amount) < ?owed)
+        """ ] .

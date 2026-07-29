@@ -1,0 +1,63 @@
+@prefix ppas: <https://w3id.org/ppas#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <https://w3id.org/ppas/example/> .
+
+#  A wind-triggered parametric product for Philippine rice smallholders.
+#
+#  PROVENANCE AND LIMITS, read this before citing anything below.
+#  The Philippine Crop Insurance Corporation announced a parametric product for rice
+#  farmers in July 2025 that settles on remote-sensed typhoon wind velocity and
+#  georeferenced farm data, targeting payment within three to five days, developed with
+#  PAGASA, PhilRice and IRRI. Those STRUCTURAL facts are public and are what is encoded
+#  here. The tier thresholds and payout ratios are NOT published by the issuer. They are
+#  stand-ins taken from PAGASA's published tropical cyclone classification boundaries so
+#  that the replay has something concrete to run against.
+#
+#  Consequently encodingConfidence is "reconstructed". This file is a demonstration of
+#  what a certified encoding looks like, not a statement of any issuer's binding terms.
+#  Replacing these stand-ins with official terms is exactly the step that requires an
+#  issuer relationship rather than a desk.
+
+ex:PHRiceTyphoonParametric a ppas:ParametricProduct ;
+    rdfs:label "Wind-triggered parametric cover for rice smallholders (reconstructed)" ;
+    ppas:hasTrigger ex:TriggerTyphoonWind ;
+    ppas:hasPayoutTier ex:TierTyphoon, ex:TierSuperTyphoon ;
+    ppas:hasExclusion ex:ExclusionPreExistingLoss ;
+    ppas:sumInsured "20000"^^xsd:decimal ;
+    ppas:currency "PHP" ;
+    ppas:settlementWindowDays "5"^^xsd:integer ;
+    ppas:encodingConfidence "reconstructed" ;
+    ppas:sourceDocumentation
+        "https://www.da.gov.ph/pcic-launches-parametric-insurance-to-expedite-claims-payouts/"^^xsd:anyURI ,
+        "https://www.pagasa.dost.gov.ph/learning-tools/tropical-cyclone-wind-signal"^^xsd:anyURI .
+
+ex:TriggerTyphoonWind a ppas:Trigger ;
+    rdfs:label "Maximum sustained wind at or above typhoon strength over the insured parcel" ;
+    ppas:observesIndex ex:IndexMSW10min ;
+    ppas:dataSource ex:PAGASA ;
+    ppas:thresholdValue "118"^^xsd:decimal ;
+    ppas:unit "km/h" ;
+    ppas:comparator ">=" .
+
+ex:IndexMSW10min a ppas:Index ;
+    rdfs:label "Ten-minute maximum sustained wind speed" ;
+    ppas:measurementBasis "10-minute sustained" ;
+    ppas:spatialBasis "insured parcel, georeferenced, from remote-sensed wind field" ;
+    rdfs:comment "The spatial basis is the assurance-critical field. A product settled on wind at the insured parcel behaves very differently from one settled on wind at the storm centre at landfall. See docs/BASIS_RISK.md." .
+
+ex:PAGASA a ppas:DataSource ;
+    rdfs:label "Philippine Atmospheric, Geophysical and Astronomical Services Administration" .
+
+ex:TierTyphoon a ppas:PayoutTier ;
+    rdfs:label "Typhoon band, 118 to 184 km/h" ;
+    ppas:tierThreshold "118"^^xsd:decimal ;
+    ppas:tierPayoutRatio "0.5"^^xsd:decimal .
+
+ex:TierSuperTyphoon a ppas:PayoutTier ;
+    rdfs:label "Super typhoon band, 185 km/h and above" ;
+    ppas:tierThreshold "185"^^xsd:decimal ;
+    ppas:tierPayoutRatio "1.0"^^xsd:decimal .
+
+ex:ExclusionPreExistingLoss a ppas:Exclusion ;
+    rdfs:label "Loss established before the cover start date" .

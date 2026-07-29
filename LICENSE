@@ -1,0 +1,16 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Copyright (c) 2026 Kampakis and Co Ltd, trading as The Tesseract Academy.
+
+You are free to share and adapt this material for any purpose, including commercially,
+provided you give appropriate credit, provide a link to the licence, and indicate if changes
+were made.
+
+Full licence text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Attribution: "Parametric Payout Assurance Standard (PPAS), Kampakis and Co Ltd trading as
+The Tesseract Academy, CC BY 4.0."
+
+Note on the software in src/ and tests/: the same CC BY 4.0 terms are applied for simplicity of
+a single-licence repository. If you need the code under a conventional software licence such as
+Apache 2.0 or MIT for downstream use, open an issue and it will be dual-licensed on request.

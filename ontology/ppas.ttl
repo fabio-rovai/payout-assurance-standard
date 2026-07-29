@@ -1,0 +1,138 @@
+@prefix ppas: <https://w3id.org/ppas#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+<https://w3id.org/ppas> a owl:Ontology ;
+    dct:title "Parametric Payout Assurance Standard (PPAS)" ;
+    dct:description "A vocabulary for making the promise of a parametric climate insurance product machine-checkable end to end: what the trigger is, who became entitled when it fired, what was disbursed, through which channel, and whether receipt was confirmed." ;
+    owl:versionInfo "0.1.0" ;
+    dct:creator "Kampakis and Co Ltd trading as The Tesseract Academy" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    rdfs:comment "Scope note: PPAS deliberately models two things that are usually held in separate systems. The promise (product, trigger, payout function) is normally in policy documentation. The delivery (entitlement, disbursement, confirmation) is normally in payment channel records. Neither alone can answer the question that matters to a farmer or fisher: did the thing that was promised actually happen." .
+
+##  ---------------------------------------------------------------
+##  The promise
+##  ---------------------------------------------------------------
+
+ppas:ParametricProduct a owl:Class ;
+    rdfs:label "Parametric product" ;
+    rdfs:comment "An insurance or contingent-finance product whose payout is determined by an observed index value rather than by assessed loss." .
+
+ppas:Trigger a owl:Class ;
+    rdfs:label "Trigger" ;
+    rdfs:comment "The condition that must hold for a payout to become due. A trigger is only assurable if its index, threshold, unit, comparator and data source are all stated." .
+
+ppas:Index a owl:Class ;
+    rdfs:label "Index" ;
+    rdfs:comment "The measurable quantity a trigger tests, for example ten-minute maximum sustained wind speed at the insured location." .
+
+ppas:DataSource a owl:Class ;
+    rdfs:label "Data source" ;
+    rdfs:comment "The authority whose published measurement settles the index. Naming it is what makes a trigger independently checkable." .
+
+ppas:PayoutTier a owl:Class ;
+    rdfs:label "Payout tier" ;
+    rdfs:comment "A band mapping an index threshold to a share of the sum insured." .
+
+ppas:Exclusion a owl:Class ;
+    rdfs:label "Exclusion" ;
+    rdfs:comment "A stated condition under which no payout is due even if the trigger fires." .
+
+ppas:hasTrigger a owl:ObjectProperty ;
+    rdfs:domain ppas:ParametricProduct ; rdfs:range ppas:Trigger .
+ppas:observesIndex a owl:ObjectProperty ;
+    rdfs:domain ppas:Trigger ; rdfs:range ppas:Index .
+ppas:dataSource a owl:ObjectProperty ;
+    rdfs:domain ppas:Trigger ; rdfs:range ppas:DataSource .
+ppas:hasPayoutTier a owl:ObjectProperty ;
+    rdfs:domain ppas:ParametricProduct ; rdfs:range ppas:PayoutTier .
+ppas:hasExclusion a owl:ObjectProperty ;
+    rdfs:domain ppas:ParametricProduct ; rdfs:range ppas:Exclusion .
+
+ppas:thresholdValue a owl:DatatypeProperty ;
+    rdfs:domain ppas:Trigger ; rdfs:range xsd:decimal .
+ppas:unit a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Unit of the threshold, for example km/h or mm." .
+ppas:comparator a owl:DatatypeProperty ; rdfs:domain ppas:Trigger ; rdfs:range xsd:string ;
+    rdfs:comment "One of >=, >, <=, < . Stated explicitly because 'winds of 185 km/h' is ambiguous at the boundary." .
+ppas:measurementBasis a owl:DatatypeProperty ; rdfs:domain ppas:Index ; rdfs:range xsd:string ;
+    rdfs:comment "For example 10-minute sustained, 1-minute sustained, or gust. Products that do not state this are not comparable to each other." .
+ppas:spatialBasis a owl:DatatypeProperty ; rdfs:domain ppas:Index ; rdfs:range xsd:string ;
+    rdfs:comment "Where the index is measured: insured location, nearest station, storm centre at landfall, or gridded cell. This is the single largest source of basis risk and is frequently unstated." .
+ppas:tierThreshold a owl:DatatypeProperty ; rdfs:domain ppas:PayoutTier ; rdfs:range xsd:decimal .
+ppas:tierPayoutRatio a owl:DatatypeProperty ; rdfs:domain ppas:PayoutTier ; rdfs:range xsd:decimal ;
+    rdfs:comment "Share of sum insured payable in this tier, 0 to 1." .
+ppas:settlementWindowDays a owl:DatatypeProperty ; rdfs:domain ppas:ParametricProduct ; rdfs:range xsd:integer ;
+    rdfs:comment "Days from event to disbursement that the product promises." .
+ppas:sumInsured a owl:DatatypeProperty ; rdfs:range xsd:decimal .
+ppas:currency a owl:DatatypeProperty ; rdfs:range xsd:string .
+ppas:sourceDocumentation a owl:DatatypeProperty ; rdfs:range xsd:anyURI ;
+    rdfs:comment "Where the encoded terms came from. Required: an encoding with no provenance is an assertion, not a certification." .
+ppas:encodingConfidence a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "One of official, public-documentation, or reconstructed. Marks how close the encoding is to the issuer's binding wording." .
+
+##  ---------------------------------------------------------------
+##  The observed world
+##  ---------------------------------------------------------------
+
+ppas:HazardEvent a owl:Class ;
+    rdfs:label "Hazard event" ;
+    rdfs:comment "An observed climate event with a measured index value, used both to settle live claims and to replay a product against history." .
+
+ppas:observedValue a owl:DatatypeProperty ; rdfs:domain ppas:HazardEvent ; rdfs:range xsd:decimal .
+ppas:eventDate a owl:DatatypeProperty ; rdfs:domain ppas:HazardEvent ; rdfs:range xsd:date .
+ppas:eventLocation a owl:DatatypeProperty ; rdfs:domain ppas:HazardEvent ; rdfs:range xsd:string .
+
+##  ---------------------------------------------------------------
+##  The delivery
+##  ---------------------------------------------------------------
+
+ppas:Beneficiary a owl:Class ;
+    rdfs:label "Beneficiary" ;
+    rdfs:comment "The farmer, fisher or enterprise owed a payout. Modelled as a pseudonymous identifier: PPAS never requires personal data to verify a payout reached its holder." .
+
+ppas:Entitlement a owl:Class ;
+    rdfs:label "Entitlement" ;
+    rdfs:comment "What became owed to a beneficiary when a trigger fired." .
+
+ppas:Disbursement a owl:Class ;
+    rdfs:label "Disbursement" ;
+    rdfs:comment "An attempt to settle an entitlement through a channel." .
+
+ppas:ReceiptConfirmation a owl:Class ;
+    rdfs:label "Receipt confirmation" ;
+    rdfs:comment "Evidence that the beneficiary actually received the money, from the beneficiary, their cooperative, or the channel." .
+
+ppas:PayoutChannel a owl:Class ;
+    rdfs:label "Payout channel" ;
+    rdfs:comment "The rail the money travelled on: mobile wallet, remittance agent, cheque, bank transfer, or cash." .
+
+ppas:triggeredBy a owl:ObjectProperty ; rdfs:domain ppas:Entitlement ; rdfs:range ppas:HazardEvent .
+ppas:underProduct a owl:ObjectProperty ; rdfs:domain ppas:Entitlement ; rdfs:range ppas:ParametricProduct .
+ppas:beneficiary a owl:ObjectProperty ; rdfs:domain ppas:Entitlement ; rdfs:range ppas:Beneficiary .
+ppas:settles a owl:ObjectProperty ; rdfs:domain ppas:Disbursement ; rdfs:range ppas:Entitlement .
+ppas:viaChannel a owl:ObjectProperty ; rdfs:domain ppas:Disbursement ; rdfs:range ppas:PayoutChannel .
+ppas:confirms a owl:ObjectProperty ; rdfs:domain ppas:ReceiptConfirmation ; rdfs:range ppas:Disbursement .
+
+ppas:entitledAmount a owl:DatatypeProperty ; rdfs:domain ppas:Entitlement ; rdfs:range xsd:decimal .
+ppas:disbursedAmount a owl:DatatypeProperty ; rdfs:domain ppas:Disbursement ; rdfs:range xsd:decimal .
+ppas:disbursedOn a owl:DatatypeProperty ; rdfs:domain ppas:Disbursement ; rdfs:range xsd:date .
+ppas:confirmedOn a owl:DatatypeProperty ; rdfs:domain ppas:ReceiptConfirmation ; rdfs:range xsd:date .
+ppas:confirmationMethod a owl:DatatypeProperty ; rdfs:domain ppas:ReceiptConfirmation ; rdfs:range xsd:string ;
+    rdfs:comment "For example beneficiary-attested, cooperative-attested, or channel-receipt." .
+ppas:unconfirmedReason a owl:DatatypeProperty ; rdfs:domain ppas:Disbursement ; rdfs:range xsd:string ;
+    rdfs:comment "Required when a disbursement has no confirmation. An honest 'we do not know' is assurable; silence is not." .
+
+##  ---------------------------------------------------------------
+##  Channel individuals observed in Philippine last-mile payouts
+##  ---------------------------------------------------------------
+
+ppas:MobileWallet a ppas:PayoutChannel ; skos:prefLabel "Mobile wallet" .
+ppas:RemittanceAgent a ppas:PayoutChannel ; skos:prefLabel "Remittance agent" .
+ppas:Cheque a ppas:PayoutChannel ; skos:prefLabel "Cheque" .
+ppas:BankTransfer a ppas:PayoutChannel ; skos:prefLabel "Bank transfer" .
+ppas:Cash a ppas:PayoutChannel ; skos:prefLabel "Cash" .
