@@ -172,15 +172,15 @@ we are seeking to fund.
 
 ## Written up
 
-Six articles explain the reasoning behind this repository, each engaging a different piece of the
-index-insurance literature:
+The full reasoning behind this repository is published as a single study:
+**[Can a parametric climate insurance product prove it paid?](https://gov.tesseract.academy/research/parametric-payout-assurance)**
 
-- [Can a parametric climate insurance product prove it paid?](https://gov.tesseract.academy/research/parametric-payout-assurance) — the pillar: three failure points, twelve rules.
-- [The 8 km/h that decided a season](https://gov.tesseract.academy/research/basis-risk-false-negative) — computing the Nalgae false negative, and what the revisionist basis-risk literature gets right.
-- [The payout that fails before the storm](https://gov.tesseract.academy/research/pre-event-payability) — register integrity as the binding constraint under bulk enrolment.
-- [Two products, one headline, different promises](https://gov.tesseract.academy/research/spatial-basis-disclosure) — why spatial basis is the disclosure that decides who gets paid.
-- [Verification cuts both ways](https://gov.tesseract.academy/research/verification-burden-paradox) — absent verification destroys trust, added verification destroys uptake, and where that leaves the checking.
-- [What a certification standard owes its own evidence](https://gov.tesseract.academy/research/assurance-provenance-discipline) — the provenance discipline, including catching ourselves citing Wikipedia.
+It covers the three failure points and the twelve rules, the Nalgae false negative and what the
+revisionist basis-risk literature gets right, register integrity as the binding constraint under
+bulk enrolment, why spatial basis is the disclosure that decides who gets paid, why verification
+imposed on the claimant suppresses uptake while verification owed by the payer does not, and the
+provenance discipline including catching ourselves citing Wikipedia for a landfall wind speed.
+Six peer-reviewed papers are engaged directly and listed with DOIs.
 
 ## Citing and contributing
 
